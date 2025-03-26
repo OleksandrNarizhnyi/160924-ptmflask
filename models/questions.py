@@ -15,8 +15,11 @@ class Question(db.Model):
     text: Mapped[str] = mapped_column(
         db.String(255),
     )
-
     answers: Mapped[list['Answer']] = db.relationship('Answer', back_populates='question')
+    category_id: Mapped[int] = mapped_column(
+        db.Integer,
+        db.ForeignKey('categories.id'),
+    )
 
     def __repr__(self):
         return f'Question: {self.text}'
@@ -45,3 +48,4 @@ class Statistic(db.Model):
             self.agree_count,
             self.disagree_count
         )
+

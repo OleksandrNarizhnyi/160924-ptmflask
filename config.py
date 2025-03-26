@@ -10,7 +10,8 @@ load_dotenv(dotenv_path=BASE_DIR / ".env")
 class Config:
     DEBUG: bool = False
     TESTING: bool = False
-    SQLALCHEMY_DATABASE_URI: str = os.getenv("SQLALCHEMY_DATABASE_URI")
+    #SQLALCHEMY_DATABASE_URI: str = os.getenv("URL_HW_5")
+    SQLALCHEMY_DATABASE_URI: str = "sqlite:///my_hw_5_database.db"
 
 
 class DevelopmentConfig(Config):
