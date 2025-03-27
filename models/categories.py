@@ -17,5 +17,7 @@ class Category(db.Model):
         nullable=True
     )
 
+    question: Mapped['Question'] = db.relationship('Question', back_populates='categories', cascade="all, delete")
+
     def __repr__(self):
         return f'Category: {self.name}'

@@ -1,9 +1,13 @@
 from flask import Blueprint, request, jsonify, Response
 from controllers.questions import (
     get_all_questions,
-    create_new_question
+    create_new_question,
+    get_question_by_id,
+    update_question,
 )
 from models.questions import Question
+from pydantic import ValidationError
+from schemas.questions import QuestionCreate, QuestionResponse
 
 questions_bp = Blueprint(name="questions", import_name=__name__)
 
@@ -43,30 +47,55 @@ def questions_list() -> Response | tuple[Response, int]:
     if request.method == "POST":
         data = request.json
 
+        try:
+            new_question = create_new_question(raw_data=data)
+        except ValidationError as err:
+            return jsonify(err.errors()), 400
+        return jsonify(
+            QuestionResponse(
+                id=new_question.id,
+                text=new_question.text,
+                category_id=new_question.category_id,
+            ).model_dump()
+        ), 201  # CREATED
+
+
+@questions_bp.route('/<int:id>', methods=["GET", "PUT", "DELETE"])
+def retrieve_question(id: int):
+    if request.method == "GET":
+        question_by_id = get_question_by_id(id=id)
+        if not question_by_id:
+            return jsonify(
+                {
+                    "error": f"ID {id} not found."
+                }
+            ), 404
+
+        return jsonify(question_by_id)
+# Реализзовать эндпоинт на обновление конкретного вопроса по его ID
+    if request.method == "PUT":
+        question_by_id = get_question_by_id(id=id)
+        if not question_by_id:
+            return jsonify(
+                {
+                    "error": f"ID {id} not found."
+                }
+            ), 404
+        data = request.json
         if not data or "text" not in data:
             return jsonify(
                 {
                     "error": "No required field provided.('text')"
                 }
             ), 400
-
-        new_question = create_new_question(raw_data=data)
-
+        updated_question = update_question(obj=question_by_id, new_data=data)
         return jsonify(
             {
-                "messege": "New question created successfully.",
-                "id": new_question.id
+                "id": updated_question.id,
+                "text": updated_question.text
             }
-        ), 201 #CREATED
+        ), 200
 
-
-@questions_bp.route('/<int:id>', methods=["GET", "PUT", "DELETE"])
-def retrieve_question(id: int):
-    if request.method == "GET":
-        return f"QUESTION - {id}"
-
-    if request.method == "PUT":
-        return f"QUESTION UPDATE BY ID - {id}"
 
     if request.method == "DELETE":
         return f"QUESTION DELETE BY ID - {id}"

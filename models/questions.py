@@ -15,11 +15,14 @@ class Question(db.Model):
     text: Mapped[str] = mapped_column(
         db.String(255),
     )
-    answers: Mapped[list['Answer']] = db.relationship('Answer', back_populates='question')
     category_id: Mapped[int] = mapped_column(
         db.Integer,
-        db.ForeignKey('categories.id'),
+        db.ForeignKey('categories.id', ondelete="CASCADE"),
+        nullable=True,
     )
+    categories: Mapped[list['Category']] = db.relationship('Category', back_populates='question')
+    answers: Mapped[list['Answer']] = db.relationship('Answer', back_populates='question')
+
 
     def __repr__(self):
         return f'Question: {self.text}'
