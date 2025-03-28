@@ -1,16 +1,13 @@
 from models.questions import Question
-from schemas.questions import QuestionCreate
+from schemas.questions import QuestionCreate, QuestionResponse
+from controllers.categories import get_category_by_id
 from models import db
 
 def get_all_questions() -> list[dict[str,int |str]]:
     questions = Question.query.all()
 
     questions_data = [
-        {
-            "id": question.id,
-            "text": question.text,
-            "category_id": question.category_id
-        }
+        QuestionResponse.model_validate(question).model_dump()
         for question in questions
     ]
 
@@ -18,7 +15,7 @@ def get_all_questions() -> list[dict[str,int |str]]:
 
 def create_new_question(raw_data: dict[str, str | int]) -> Question:
     validated_obj = QuestionCreate.model_validate(raw_data)
-
+    get_category_by_id(validated_obj.category_id)
     new_obj = Question(text=validated_obj.text, category_id=validated_obj.category_id)
 
     db.session.add(new_obj)

@@ -38,12 +38,6 @@ def get_categories() -> Response | tuple[Response, int]:
 def retrieve_category(id: int):
     if request.method == "GET":
         category_by_id = get_category_by_id(id=id)
-        if not category_by_id:
-            return jsonify(
-                {
-                    "error": f"ID {id} not found."
-                }
-            ), 404
 
         category_dict = {
             "id": category_by_id.id,

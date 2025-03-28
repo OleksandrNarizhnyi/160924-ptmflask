@@ -28,7 +28,7 @@ def create_new_category(raw_data: dict[str, str]):
 
 
 def get_category_by_id(id: int) -> dict[str, int | str]:
-    category_by_id = Category.query.get(id)
+    category_by_id = Category.query.get_or_404(id)
 
     return category_by_id
 
