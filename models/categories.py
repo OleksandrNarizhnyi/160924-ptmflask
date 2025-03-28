@@ -7,17 +7,15 @@ class Category(db.Model):
 
     id: Mapped[int] = mapped_column(
         db.Integer,
-        db.Identity(always=True),
         primary_key=True,
         autoincrement=True
     )
 
     name: Mapped[str] = mapped_column(
         db.String(50),
-        nullable=True
     )
 
-    question: Mapped['Question'] = db.relationship('Question', back_populates='categories', cascade="all, delete")
+    questions: Mapped[list['Question']] = db.relationship('Question', back_populates='category', cascade="all, delete")
 
     def __repr__(self):
         return f'Category: {self.name}'
